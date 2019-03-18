@@ -5,8 +5,10 @@ import com.matrangola.school.domain.Student;
 import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.StudentService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class RegistrationApp {
 
@@ -39,34 +41,21 @@ public class RegistrationApp {
 		init(ss);
 		List<Student> students = ss.getAllStudents();
 
-		for (Student student : students) {
-			System.out.println("for student: " + student.getName());
-		}
-
-		String prompt = "student:";
-
-		students.forEach( s -> {
-			System.out.println("lambda " + prompt + s.getName());
-			if (s.getId() > 1) {
-				System.out.println("late student: " + s.getName());
-			}
-		});
+		students.stream().sorted(Comparator.comparing(Student::getName)).forEach(RegistrationApp::niceStudent);
 
 
-		students.forEach(new Consumer<Student>() {
-			@Override
-			public void accept(Student student) {
-				System.out.println("consumer: " + student.getName());
-			}
-		});
-
-
-		students.forEach(RegistrationApp::niceStudent);
 
 		CourseService cs = new CourseService();
 		init(cs);
 		List<Course> courses = cs.getAllCourses();
 		courses.forEach(System.out::println);
+
+		Stream<Course> courseStream = cs.getAllCourses().stream();
+		Float totalCredits = courseStream
+				.map(Course::getCredits)
+				.peek( aFloat -> System.out.println("f = " + aFloat))
+				.reduce(0.0f, (a, b) -> a + b);
+		System.out.println("Total Credits " + totalCredits);
 
 	}
 

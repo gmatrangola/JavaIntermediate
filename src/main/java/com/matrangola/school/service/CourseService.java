@@ -14,8 +14,9 @@ public class CourseService {
 		courseDAO = new InMemoryCourseDAO();
 	}
 	
-	public Course createCourse(String code, String title) {
+	public Course createCourse(String code, String title, float credits) {
 		Course course = new Course(code, title);
+		course.setCredits(credits);
 		course = courseDAO.create(course);
 		
 		return course;

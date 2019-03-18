@@ -1,58 +1,21 @@
 package com.matrangola.school.dao.inmemory;
 
-import com.matrangola.school.dao.BaseDAO;
 import com.matrangola.school.domain.Student;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class InMemoryStudentDAO implements BaseDAO<Student> {
+public class InMemoryStudentDAO extends RegisterDAO<Student> {
 
-	private Map<Integer, Student> students = new HashMap<>();
-	private static int nextId = 0;
-
-	@Override
-	public void update(Student updateObject) {
-		if(students.containsKey(updateObject.getId())) {
-			students.put(updateObject.getId(), updateObject);
-		}
-	}
-
-	@Override
-	public void delete(Student student) {
-		students.remove(student.getId());
-	}
-
-	public Student create(Student newObject) {
-		//Create a new Id
-		int newId = nextId++;
-		newObject.setId(newId);
-		students.put(newId, newObject);
-		
-		return newObject;
-	}
-
-	@Override
-	public Student get(int id) {
-		return students.get(id);
-	}
-
-	@Override
-	public List<Student> getAll() {
-		return new ArrayList<Student>(students.values());
-	}
-	
 	public void deleteStore() {
-		students = null;
+		itemMap = null;
 	}
-	
+
 	public void createStore() {
-		students = new HashMap<Integer, Student>();
+		itemMap = new HashMap<Integer, Student>();
 	}
 
 	public Map<Integer, Student> getStudents() {
-		return students;
+		return itemMap;
 	}
 }

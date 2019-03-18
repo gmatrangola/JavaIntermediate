@@ -1,8 +1,7 @@
 package com.matrangola.school.domain;
 
-public class Course {
-	
-	private int id;
+public class Course extends RegistrationItem {
+
 	private String title;
 	private String code;
 	private float credits = 2.5f;
@@ -18,13 +17,7 @@ public class Course {
 		this.title = title;
 		this.code = code;
 	}
-	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
+
 	public String getTitle() {
 		return title;
 	}

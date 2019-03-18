@@ -1,6 +1,6 @@
 package com.matrangola.school.domain;
 
-public class Student {
+public class Student extends RegistrationItem {
 	
 	public enum Status { 
 		FULL_TIME,
@@ -8,7 +8,6 @@ public class Student {
 		HIBERNATING
 	};
 	
-	private int id;
 	private String name;
 	private String phoneNumber;
 	
@@ -24,12 +23,6 @@ public class Student {
 		this.status = status;
 	}
 	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
 	public String getName() {
 		return name;
 	}

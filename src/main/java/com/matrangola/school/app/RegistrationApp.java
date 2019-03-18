@@ -6,6 +6,7 @@ import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.StudentService;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class RegistrationApp {
 
@@ -37,13 +38,40 @@ public class RegistrationApp {
 		StudentService ss = new StudentService();
 		init(ss);
 		List<Student> students = ss.getAllStudents();
-		students.forEach(System.out::println);
+
+		for (Student student : students) {
+			System.out.println("for student: " + student.getName());
+		}
+
+		String prompt = "student:";
+
+		students.forEach( s -> {
+			System.out.println("lambda " + prompt + s.getName());
+			if (s.getId() > 1) {
+				System.out.println("late student: " + s.getName());
+			}
+		});
+
+
+		students.forEach(new Consumer<Student>() {
+			@Override
+			public void accept(Student student) {
+				System.out.println("consumer: " + student.getName());
+			}
+		});
+
+
+		students.forEach(RegistrationApp::niceStudent);
 
 		CourseService cs = new CourseService();
 		init(cs);
 		List<Course> courses = cs.getAllCourses();
 		courses.forEach(System.out::println);
 
+	}
+
+	private static void niceStudent(Student student) {
+		 System.out.println("Student: " + student.getName());
 	}
 
 	public static void init(StudentService ss) {

@@ -10,15 +10,17 @@ import java.util.Map;
 
 public class InMemoryStudentDAO implements BaseDAO<Student> {
 
-	private Map<Integer, Student> students = new HashMap<Integer, Student>();
+	private Map<Integer, Student> students = new HashMap<>();
 	private static int nextId = 0;
-	
+
+	@Override
 	public void update(Student updateObject) {
 		if(students.containsKey(updateObject.getId())) {
 			students.put(updateObject.getId(), updateObject);
 		}
 	}
 
+	@Override
 	public void delete(Student student) {
 		students.remove(student.getId());
 	}
@@ -32,10 +34,12 @@ public class InMemoryStudentDAO implements BaseDAO<Student> {
 		return newObject;
 	}
 
+	@Override
 	public Student get(int id) {
 		return students.get(id);
 	}
 
+	@Override
 	public List<Student> getAll() {
 		return new ArrayList<Student>(students.values());
 	}

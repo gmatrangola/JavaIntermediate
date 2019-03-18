@@ -1,12 +1,14 @@
 # Intermediate Java
 
+# https://github.com/gmatrangola/JavaIntermediate
+
 ## Sample Project 
 
 This project has many of the same patterns as the LABS. During class the instructor will push updates as I live code enhancements in functionality and improvements to the architecture.
 
 ### Overview
 
-This is based on *Anal Pal's* [<https://github.com/anildi>] starter code. I changed it to use Gradle in instead of maven and changed the package structure slightly. The in-class live-coding will be different for this class than his (to match for the custom outline and class needs) so the end result will very from his.
+This is based on *Anil Pal's* [<https://github.com/anildi>] starter code. I changed it to use Gradle in instead of maven and changed the package structure slightly. The in-class live-coding will be different for this class than his (to match for the custom outline and class needs) so the end result will very from his.
 
 The project represents a School data, it tracks students and courses. The starter data includes a data model (in the domain package), DAO (Data Access Objects), and service classes.  (Ignore the Track stuff for now)
 

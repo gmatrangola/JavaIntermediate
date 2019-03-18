@@ -1,12 +1,15 @@
 package com.matrangola.school.app;
 
 import com.matrangola.school.domain.Course;
+import com.matrangola.school.domain.Section;
 import com.matrangola.school.domain.Student;
 import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.ScheduleService;
 import com.matrangola.school.service.StudentService;
 
 import static java.time.DayOfWeek.*;
+
+import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -64,16 +67,31 @@ public class RegistrationApp {
 		courseStream.filter(course -> course.getCredits() < 3.0f).forEach(System.out::println);
 
 		OptionalDouble easyAverage = cs.getAllCourses().stream().mapToDouble(Course::getCredits).average();
+		if (easyAverage.isPresent()) System.out.println("Easy Average: " + easyAverage.getAsDouble());
 
 		ScheduleService scheduleService = new ScheduleService();
-		scheduleService.schedule(cs.getCourse(0), MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(cs.getCourse(0), TUESDAY, THURSDAY);
-		scheduleService.schedule(cs.getCourse(1), THURSDAY, TUESDAY);
-		scheduleService.schedule(cs.getCourse(2), MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(cs.getCourse(2), TUESDAY, THURSDAY);
+		Course course = cs.getCourse(1);
+		scheduleService.schedule(course, MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(cs.getCourse(1), TUESDAY, THURSDAY);
+		scheduleService.schedule(cs.getCourse(2), THURSDAY, TUESDAY);
+		scheduleService.schedule(cs.getCourse(3), MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(cs.getCourse(3), TUESDAY, THURSDAY);
 
+		List<Section> sections = scheduleService.getSections();
+		for (Section section : sections) {
+			Course course1 = section.getCourse();
+			System.out.println("Course " + course1.getTitle() + " Days: " + printDays(section));
+		}
 
+	}
 
+	private static String printDays(Section section) {
+		StringBuilder sb = new StringBuilder();
+		for (DayOfWeek dayOfWeek : section.getDaysOfWeek()) {
+			if (sb.length() > 0) sb.append(", ");
+			sb.append(dayOfWeek);
+		}
+		return sb.toString();
 	}
 
 	private static void niceStudent(Student student) {

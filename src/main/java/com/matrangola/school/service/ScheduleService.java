@@ -5,6 +5,7 @@ import com.matrangola.school.domain.Course;
 import com.matrangola.school.domain.Section;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 public class ScheduleService {
     private SectionDAO sectionDao = new SectionDAO();
@@ -14,5 +15,9 @@ public class ScheduleService {
         section.setCourse(course);
         section.setDaysOfWeek(days);
         return sectionDao.create(section);
+    }
+
+    public List<Section> getSections() {
+        return sectionDao.getAll();
     }
 }

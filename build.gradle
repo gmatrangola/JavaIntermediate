@@ -1,11 +1,15 @@
 plugins {
-    id 'java'
+    id 'application'
 }
 
 group 'com.matrangola'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+
+application {
+    mainClassName = 'com.matrangola.school.app.RegistrationApp'
+}
 
 repositories {
     mavenCentral()

@@ -85,16 +85,23 @@ public class RegistrationApp {
 			System.out.println("Course " + course1.getTitle() + " Days: " + printDays(section));
  		}
 
-		System.out.println("Smith Course Codes:");
-		Set<String> smith = scheduleService.getCourseCodesByInstructor("Smith");
-		smith.forEach(System.out::println);
+		printSchedule(scheduleService, "Smith", "Jones", "Washington");
 
-		System.out.println("Washington Course Codes");
-		Set<String> washington = scheduleService.getCourseCodesByInstructor("Washington");
-		washington.forEach(System.out::println);
 
 //		System.out.println("Section IDs");
 //		printIds(scheduleService.getSections(), cs.getAllCourses(), ss.getAllStudents());
+	}
+
+	private static void printSchedule(ScheduleService scheduleService, final String ... instructors) {
+		for (String instructor : instructors) {
+			System.out.println(instructor + " Course Codes:");
+			Set<String> courses = scheduleService.getCourseCodesByInstructor(instructor);
+			courses.forEach(System.out::println);
+			List<Section> sections = scheduleService.getSectionsByInstructor(instructor);
+			System.out.println(instructor + " Sections:");
+			sections.forEach(System.out::println);
+		}
+
 	}
 
 	public static void printIds(List<? extends RegistrationItem> ... items) {

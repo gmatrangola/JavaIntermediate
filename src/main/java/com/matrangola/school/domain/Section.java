@@ -2,6 +2,7 @@ package com.matrangola.school.domain;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Section extends RegistrationItem {
@@ -45,5 +46,15 @@ public class Section extends RegistrationItem {
 
     public void setInstructor(String instructor) {
         this.instructor = instructor;
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                "course=" + course +
+                ", daysOfWeek=" + Arrays.toString(daysOfWeek) +
+                ", students=" + students +
+                ", instructor='" + instructor + '\'' +
+                '}';
     }
 }

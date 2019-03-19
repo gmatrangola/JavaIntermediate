@@ -27,7 +27,8 @@ public class RegisterDAO<T extends RegistrationItemInterface> implements BaseDAO
     @Override
     public T create(T newObject) {
         newObject.setId(++nextId);
-        return itemMap.put(newObject.getId(), newObject);
+        itemMap.put(newObject.getId(), newObject);
+        return newObject;
     }
 
     @Override

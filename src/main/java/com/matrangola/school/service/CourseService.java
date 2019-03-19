@@ -3,6 +3,7 @@ package com.matrangola.school.service;
 import com.matrangola.school.dao.BaseDAO;
 import com.matrangola.school.dao.inmemory.InMemoryCourseDAO;
 import com.matrangola.school.domain.Course;
+import com.matrangola.school.domain.Internship;
 
 import java.util.List;
 
@@ -20,6 +21,12 @@ public class CourseService {
 		course = courseDAO.create(course);
 		
 		return course;
+	}
+
+	public Internship createInternship(String code, String title, float credits) {
+		Internship internship = new Internship(code, title);
+		internship = (Internship) courseDAO.create(internship);
+		return internship;
 	}
 	
 	public Course createCourse(Course course) {

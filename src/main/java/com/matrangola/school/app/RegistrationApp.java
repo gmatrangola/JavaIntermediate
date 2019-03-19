@@ -1,9 +1,6 @@
 package com.matrangola.school.app;
 
-import com.matrangola.school.domain.Course;
-import com.matrangola.school.domain.RegistrationItem;
-import com.matrangola.school.domain.Section;
-import com.matrangola.school.domain.Student;
+import com.matrangola.school.domain.*;
 import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.ScheduleService;
 import com.matrangola.school.service.StudentService;
@@ -11,6 +8,12 @@ import com.matrangola.school.service.StudentService;
 import static java.time.DayOfWeek.*;
 
 import java.time.DayOfWeek;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -73,11 +76,20 @@ public class RegistrationApp {
 
 		ScheduleService scheduleService = new ScheduleService();
 		Course course = cs.getCourse(1);
-		scheduleService.schedule(course, "Smith", MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(cs.getCourse(1), "Jones", TUESDAY, THURSDAY);
-		scheduleService.schedule(cs.getCourse(2), "Smith", THURSDAY, TUESDAY);
-		scheduleService.schedule(cs.getCourse(3), "Washington", MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(cs.getCourse(3), "Washington", TUESDAY, THURSDAY);
+
+        ZonedDateTime start = ZonedDateTime.of(2020, 9, 1, 0, 0, 0, 0, ZoneId.of("America/New_York"));
+        ZonedDateTime end = ZonedDateTime.of(2020, 12, 23, 0, 0, 0, 0, ZoneId.of("America/New_York"));
+
+        Period length = Period.between(start.toLocalDate(), end.toLocalDate());
+        System.out.println("Semester is " + length.getDays() + " days long.");
+
+        Semester semester = new Semester(start, end);
+
+		scheduleService.schedule(semester, course, "Smith", MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(semester, cs.getCourse(1), "Jones", TUESDAY, THURSDAY);
+		scheduleService.schedule(semester, cs.getCourse(2), "Smith", THURSDAY, TUESDAY);
+        Section sectionW = scheduleService.schedule(semester, cs.getCourse(3), "Washington", MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(semester, cs.getCourse(3), "Washington", TUESDAY, THURSDAY);
 
 		List<Section> sections = scheduleService.getSections();
 		for (Section section : sections) {
@@ -86,11 +98,36 @@ public class RegistrationApp {
  		}
 
 		printSchedule(scheduleService, "Smith", "Jones", "Washington");
-
+        printSchedule(sectionW);
 
 //		System.out.println("Section IDs");
 //		printIds(scheduleService.getSections(), cs.getAllCourses(), ss.getAllStudents());
 	}
+
+    public static void printSchedule(Section section) {
+        Semester semester = section.getSemester();
+        ZonedDateTime start = semester.getStart();
+        ZonedDateTime end = semester.getEnd();
+
+        ZonedDateTime first = null;
+        for (DayOfWeek day : section.getDaysOfWeek()) {
+            ZonedDateTime next = start.with(TemporalAdjusters.nextOrSame(day));
+            if (first == null || next.isBefore(first)) first = next;
+        }
+
+        ZonedDateTime meet = first;
+        while ( meet.isBefore(end)) {
+            for (DayOfWeek day : section.getDaysOfWeek()) {
+                meet = meet.with(TemporalAdjusters.nextOrSame(day));
+                printMeeting(meet);
+            }
+        }
+    }
+
+    private static void printMeeting(ZonedDateTime next) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("EE MMMM d, yyyy");
+        System.out.println(format.format(next));
+    }
 
 	private static void printSchedule(ScheduleService scheduleService, final String ... instructors) {
 		for (String instructor : instructors) {

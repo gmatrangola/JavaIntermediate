@@ -6,22 +6,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Section extends RegistrationItem {
-    private Course course;
+    private final Semester semester;
+    private final Course course;
+    private String instructor;
     private DayOfWeek[] daysOfWeek;
     private List<Student> students = new ArrayList<>();
-    private String instructor;
 
-    public Section(Course course, String instructor) {
+    public Section(Semester semester, Course course, String instructor) {
+        this.semester = semester;
         this.course = course;
         this.instructor = instructor;
     }
 
     public Course getCourse() {
         return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
     }
 
     public DayOfWeek[] getDaysOfWeek() {
@@ -48,12 +46,15 @@ public class Section extends RegistrationItem {
         this.instructor = instructor;
     }
 
+    public Semester getSemester() {
+        return semester;
+    }
+
     @Override
     public String toString() {
         return "Section{" +
                 "course=" + course +
                 ", daysOfWeek=" + Arrays.toString(daysOfWeek) +
-                ", students=" + students +
                 ", instructor='" + instructor + '\'' +
                 '}';
     }

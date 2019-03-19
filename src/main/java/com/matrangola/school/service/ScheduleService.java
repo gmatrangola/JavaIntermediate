@@ -3,6 +3,7 @@ package com.matrangola.school.service;
 import com.matrangola.school.dao.inmemory.SectionDAO;
 import com.matrangola.school.domain.Course;
 import com.matrangola.school.domain.Section;
+import com.matrangola.school.domain.Semester;
 
 import java.time.DayOfWeek;
 import java.util.*;
@@ -11,8 +12,8 @@ public class ScheduleService {
     private SectionDAO sectionDao = new SectionDAO();
     private Map<String, Map<String, List<Section>>> instructorSections = new HashMap<>();
 
-    public Section schedule(Course course, String instructor, DayOfWeek ... days) {
-        Section section = new Section(course, instructor);
+    public Section schedule(Semester semester, Course course, String instructor, DayOfWeek ... days) {
+        Section section = new Section(semester, course, instructor);
         section.setDaysOfWeek(days);
         section = sectionDao.create(section);
 

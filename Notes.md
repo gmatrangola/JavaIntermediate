@@ -281,3 +281,59 @@ for (String s : old) {
 }
 ```
 
+
+
+## Generics
+
+```java
+public static <T> void printList(String title, Iterable<T> thingy) {
+    System.out.println(title);
+    for (T o : thingy) {
+        System.out.println(o.toString());
+    }
+}
+
+public static <T, V extends Iterable<T>> void printList2(String title, V items) {
+    System.out.println(title);
+    for (T item : items) {
+        System.out.println(item);
+    }
+}
+```
+
+```java
+public static int findMaxId(List<? extends IdBean> items) {
+    return items.stream().mapToInt(IdBean::getId).max().getAsInt();
+}
+```
+
+## Date Time API
+
+```java
+public static void printSchedule(Section section) {
+    Semester semester = section.getSemester();
+    ZonedDateTime start = semester.getStart();
+    ZonedDateTime end = semester.getEnd();
+
+    ZonedDateTime first = null;
+    for (DayOfWeek day : section.getDays()) {
+        ZonedDateTime next = start.with(TemporalAdjusters.nextOrSame(day));
+        if (first == null || next.isBefore(first)) first = next;
+    }
+
+    ZonedDateTime meet = first;
+    while (first.isBefore(end)) {
+        for (DayOfWeek day : section.getDays()) {
+            ZonedDateTime next = start.with(TemporalAdjusters.nextOrSame(day));
+            printMeeting(next);
+        }
+
+    }
+}
+
+private static void printMeeting(ZonedDateTime next) {
+    DateTimeFormatter format = DateTimeFormatter.ofPattern("MMMM d, yyyy");
+    System.out.println(format.format(next));
+}
+```
+

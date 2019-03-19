@@ -1,6 +1,7 @@
 package com.matrangola.school.app;
 
 import com.matrangola.school.domain.Course;
+import com.matrangola.school.domain.RegistrationItem;
 import com.matrangola.school.domain.Section;
 import com.matrangola.school.domain.Student;
 import com.matrangola.school.service.CourseService;
@@ -13,6 +14,7 @@ import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class RegistrationApp {
@@ -56,11 +58,11 @@ public class RegistrationApp {
 		courses.forEach(System.out::println);
 
 		Stream<Course> courseStream = cs.getAllCourses().stream();
-		Float averageCredits = courseStream
+		Float totalCredits = courseStream
 				.map(Course::getCredits)
 				.peek( aFloat -> System.out.println("f = " + aFloat))
 				.reduce(0.0f, (a, b) -> a + b);
-		System.out.println("Average Credits " + averageCredits / courses.size());
+		System.out.println("Average Credits " + totalCredits / courses.size());
 
 		courseStream = cs.getAllCourses().stream();
 		System.out.println("Lower level classes...");
@@ -71,18 +73,34 @@ public class RegistrationApp {
 
 		ScheduleService scheduleService = new ScheduleService();
 		Course course = cs.getCourse(1);
-		scheduleService.schedule(course, MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(cs.getCourse(1), TUESDAY, THURSDAY);
-		scheduleService.schedule(cs.getCourse(2), THURSDAY, TUESDAY);
-		scheduleService.schedule(cs.getCourse(3), MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(cs.getCourse(3), TUESDAY, THURSDAY);
+		scheduleService.schedule(course, "Smith", MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(cs.getCourse(1), "Jones", TUESDAY, THURSDAY);
+		scheduleService.schedule(cs.getCourse(2), "Smith", THURSDAY, TUESDAY);
+		scheduleService.schedule(cs.getCourse(3), "Washington", MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(cs.getCourse(3), "Washington", TUESDAY, THURSDAY);
 
 		List<Section> sections = scheduleService.getSections();
 		for (Section section : sections) {
 			Course course1 = section.getCourse();
 			System.out.println("Course " + course1.getTitle() + " Days: " + printDays(section));
-		}
+ 		}
 
+		System.out.println("Smith Course Codes:");
+		Set<String> smith = scheduleService.getCourseCodesByInstructor("Smith");
+		smith.forEach(System.out::println);
+
+		System.out.println("Washington Course Codes");
+		Set<String> washington = scheduleService.getCourseCodesByInstructor("Washington");
+		washington.forEach(System.out::println);
+
+//		System.out.println("Section IDs");
+//		printIds(scheduleService.getSections(), cs.getAllCourses(), ss.getAllStudents());
+	}
+
+	public static void printIds(List<? extends RegistrationItem> ... items) {
+		for (List<? extends RegistrationItem> item : items) {
+			item.stream().mapToInt(RegistrationItem::getId).forEach(System.out::println);
+		}
 	}
 
 	private static String printDays(Section section) {

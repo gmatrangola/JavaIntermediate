@@ -8,8 +8,11 @@ public class Section extends RegistrationItem {
     private Course course;
     private DayOfWeek[] daysOfWeek;
     private List<Student> students = new ArrayList<>();
+    private String instructor;
 
-    public Section() {
+    public Section(Course course, String instructor) {
+        this.course = course;
+        this.instructor = instructor;
     }
 
     public Course getCourse() {
@@ -34,5 +37,13 @@ public class Section extends RegistrationItem {
 
     public void setStudents(List<Student> students) {
         this.students = students;
+    }
+
+    public String getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(String instructor) {
+        this.instructor = instructor;
     }
 }

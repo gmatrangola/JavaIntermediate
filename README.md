@@ -26,3 +26,14 @@ Students will create classes that model the Item and Customer, a DAO, and Servic
 
 The code should follow standard Java Coding Standards. Correct capitalization, indention, etc. The code should be clear and commented better than the Starter set.
 
+### Date Time API Additions
+
+Create a subclass of Item called Cleaning Service. Add fields for Start and End of cleaning service. Add the days of week that the cleaner will clean. For example, every Wed or Thursday. Create a function to print cleaning schedule that will print out the days that the cleaner will work.  For example..
+
+Cleaner cleans every Tuesday starting April 1:
+
+Tue, April 2, 2019
+
+Tue, April 9, 2019
+
+Tue, April 16, 2019

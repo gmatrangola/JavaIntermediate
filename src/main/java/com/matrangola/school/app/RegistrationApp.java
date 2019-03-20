@@ -35,7 +35,7 @@ public class RegistrationApp {
 		jsonDir = file;
 		jsonDir.mkdir();
 		studentService = new StudentService();
-		courseService = new CourseService();
+		courseService = new CourseService(jsonDir);
 		scheduleService = new ScheduleService();
 	}
 

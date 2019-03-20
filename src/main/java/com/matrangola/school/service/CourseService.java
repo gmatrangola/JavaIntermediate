@@ -11,12 +11,34 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class CourseService {
 
 	private BaseDAO<Course> courseDAO;
 	
-	public CourseService() {
+	public CourseService(File jsonDir) {
 		courseDAO = new InMemoryCourseDAO();
+
+		Thread loadBackground = new Thread(() -> {
+			while(true) {
+				try {
+					load(jsonDir);
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (DaoException e) {
+					e.printStackTrace();
+				}
+				long count = getAllCourses().stream().count();
+				System.out.println("Loaded " + count + " object.");
+				try {
+					sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		loadBackground.start();
 	}
 	
 	public Course createCourse(String code, String title, float credits) {

@@ -18,9 +18,6 @@ public class RegisterDAO<T extends RegistrationItemInterface> implements BaseDAO
         if(!itemMap.containsKey(updateObject.getId())) {
             itemMap.put(updateObject.getId(), updateObject);
         }
-        else {
-            throw new DaoException("ID Exists: " + updateObject.getId());
-        }
     }
 
     @Override

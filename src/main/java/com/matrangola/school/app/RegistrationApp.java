@@ -47,11 +47,11 @@ public class RegistrationApp {
 			RegistrationApp app = new RegistrationApp(new File(args[1]));
 			if (args[0].equals("out")) {
 				app.primeServices();
-				app.printData();
+				app.printScheduleData();
 			}
 			else if (args[0].equals("in")) {
 				app.load();
-				app.printData();
+				app.printCourseData();
 			}
 		}
 
@@ -87,8 +87,28 @@ public class RegistrationApp {
 		students.forEach(System.out::println);
 	}
 
-	public void printData() {
+	public void printScheduleData() {
+		List<Section> sections = scheduleService.getSections();
+		for (Section section : sections) {
+			Course course1 = section.getCourse();
+			System.out.println("Course " + course1.getTitle() + " Days: " + printDays(section));
+ 		}
 
+		printSchedule(scheduleService, "Smith", "Jones", "Washington");
+        if (sectionW != null) printSchedule(sectionW);
+
+		try {
+			courseService.persist(jsonDir);
+		} catch (IOException e) {
+			System.err.println("Error saving Courses: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+
+//		System.out.println("Section IDs");
+//		printIds(scheduleService.getSections(), cs.getAllCourses(), ss.getAllStudents());
+	}
+
+	private void printCourseData() {
 		List<Student> students = studentService.getAllStudents();
 
 		students.stream().sorted(Comparator.comparing(Student::getName)).forEach(RegistrationApp::niceStudent);
@@ -109,25 +129,6 @@ public class RegistrationApp {
 
 		OptionalDouble easyAverage = courseService.getAllCourses().stream().mapToDouble(Course::getCredits).average();
 		if (easyAverage.isPresent()) System.out.println("Easy Average: " + easyAverage.getAsDouble());
-
-		List<Section> sections = scheduleService.getSections();
-		for (Section section : sections) {
-			Course course1 = section.getCourse();
-			System.out.println("Course " + course1.getTitle() + " Days: " + printDays(section));
- 		}
-
-		printSchedule(scheduleService, "Smith", "Jones", "Washington");
-        if (sectionW != null) printSchedule(sectionW);
-
-		try {
-			courseService.persist(jsonDir);
-		} catch (IOException e) {
-			System.err.println("Error saving Courses: " + e.getLocalizedMessage());
-			e.printStackTrace();
-		}
-
-//		System.out.println("Section IDs");
-//		printIds(scheduleService.getSections(), cs.getAllCourses(), ss.getAllStudents());
 	}
 
 	private void primeServices() {

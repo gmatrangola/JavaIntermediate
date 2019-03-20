@@ -1,10 +1,14 @@
 package com.matrangola.school.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matrangola.school.dao.BaseDAO;
+import com.matrangola.school.dao.DaoException;
 import com.matrangola.school.dao.inmemory.InMemoryCourseDAO;
 import com.matrangola.school.domain.Course;
 import com.matrangola.school.domain.Internship;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class CourseService {
@@ -42,10 +46,6 @@ public class CourseService {
 		}
 	}
 	
-	public void updateCourse(Course course) {
-		courseDAO.update(course);
-	}
-	
 	public Course getCourseByCode(String code) {
 		List<Course> courses = courseDAO.getAll();
 		for(Course course : courses) {
@@ -70,5 +70,30 @@ public class CourseService {
 
 	public void setCourseDAO(BaseDAO<Course> courseDAO) {
 		this.courseDAO = courseDAO;
+	}
+
+	public void persist(File jsonDir) throws IOException {
+		for (Course course : getAllCourses()) {
+			persist(jsonDir, course);
+		}
+	}
+
+	private void persist(File jsonDir, Course course) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.writeValue(new File(jsonDir, "Course-" + course.getCode() + ".json"), course);
+	}
+
+	public void load(File jsonDir) throws IOException, DaoException {
+		File[] files = jsonDir.listFiles((dir, name) -> name.startsWith("Course"));
+		for (File file : files) {
+			loadJson(file);
+		}
+
+	}
+
+	private void loadJson(File file) throws IOException, DaoException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		Course course = objectMapper.readValue(file, Course.class);
+		courseDAO.load(course);
 	}
 }

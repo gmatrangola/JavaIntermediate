@@ -14,7 +14,7 @@ public class JpaStudentDAO implements BaseDAO<Student> {
 	private static int nextId = 0;
 	
 	@Override
-	public void update(Student updateObject) {
+	public void load(Student updateObject) {
 		if(students.containsKey(updateObject.getId())) {
 			students.put(updateObject.getId(), updateObject);
 		}

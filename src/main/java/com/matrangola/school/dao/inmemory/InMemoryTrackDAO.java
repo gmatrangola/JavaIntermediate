@@ -14,7 +14,7 @@ public class InMemoryTrackDAO implements BaseDAO<Track> {
 	private static int nextId = 0;
 	
 	@Override
-	public void update(Track updateObject) {
+	public void load(Track updateObject) {
 		if(tracks.containsKey(updateObject.getId())) {
 			tracks.put(updateObject.getId(), updateObject);
 		}

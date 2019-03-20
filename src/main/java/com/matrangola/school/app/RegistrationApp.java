@@ -1,5 +1,6 @@
 package com.matrangola.school.app;
 
+import com.matrangola.school.dao.DaoException;
 import com.matrangola.school.domain.*;
 import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.ScheduleService;
@@ -7,12 +8,13 @@ import com.matrangola.school.service.StudentService;
 
 import static java.time.DayOfWeek.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
@@ -22,12 +24,51 @@ import java.util.stream.Stream;
 
 public class RegistrationApp {
 
+	private final File jsonDir;
 	int value;
+	private final StudentService studentService;
+	private final CourseService courseService;
+	private final ScheduleService scheduleService;
+	private Section sectionW;
+
+	public RegistrationApp(File file) {
+		jsonDir = file;
+		jsonDir.mkdir();
+		studentService = new StudentService();
+		courseService = new CourseService();
+		scheduleService = new ScheduleService();
+	}
 
 	public static void main(String[] args) {
-		primeAndPrintBoth();
+		if(args.length < 2) {
+			System.out.println("Usage: registration in|out directory");
+		}
+		else {
+			RegistrationApp app = new RegistrationApp(new File(args[1]));
+			if (args[0].equals("out")) {
+				app.primeServices();
+				app.printData();
+			}
+			else if (args[0].equals("in")) {
+				app.load();
+				app.printData();
+			}
+		}
+
 		 //postRequestToAddAStudent();
 		 //getRequestForAllStudents();
+	}
+
+	private void load() {
+		try {
+			courseService.load(jsonDir);
+		} catch (IOException e) {
+			System.err.println("Error reading JSON file "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} catch (DaoException e) {
+			System.err.println("Error inserting JSON file "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		}
 	}
 
 
@@ -46,50 +87,28 @@ public class RegistrationApp {
 		students.forEach(System.out::println);
 	}
 
-	public static void primeAndPrintBoth() {
-		StudentService ss = new StudentService();
-		init(ss);
-		List<Student> students = ss.getAllStudents();
+	public void printData() {
+
+		List<Student> students = studentService.getAllStudents();
 
 		students.stream().sorted(Comparator.comparing(Student::getName)).forEach(RegistrationApp::niceStudent);
 
-
-
-		CourseService cs = new CourseService();
-		init(cs);
-		List<Course> courses = cs.getAllCourses();
+		List<Course> courses = courseService.getAllCourses();
 		courses.forEach(System.out::println);
 
-		Stream<Course> courseStream = cs.getAllCourses().stream();
+		Stream<Course> courseStream = courseService.getAllCourses().stream();
 		Float totalCredits = courseStream
 				.map(Course::getCredits)
 				.peek( aFloat -> System.out.println("f = " + aFloat))
 				.reduce(0.0f, (a, b) -> a + b);
 		System.out.println("Average Credits " + totalCredits / courses.size());
 
-		courseStream = cs.getAllCourses().stream();
+		courseStream = courseService.getAllCourses().stream();
 		System.out.println("Lower level classes...");
 		courseStream.filter(course -> course.getCredits() < 3.0f).forEach(System.out::println);
 
-		OptionalDouble easyAverage = cs.getAllCourses().stream().mapToDouble(Course::getCredits).average();
+		OptionalDouble easyAverage = courseService.getAllCourses().stream().mapToDouble(Course::getCredits).average();
 		if (easyAverage.isPresent()) System.out.println("Easy Average: " + easyAverage.getAsDouble());
-
-		ScheduleService scheduleService = new ScheduleService();
-		Course course = cs.getCourse(1);
-
-        ZonedDateTime start = ZonedDateTime.of(2020, 9, 1, 0, 0, 0, 0, ZoneId.of("America/New_York"));
-        ZonedDateTime end = ZonedDateTime.of(2020, 12, 23, 0, 0, 0, 0, ZoneId.of("America/New_York"));
-
-        Period length = Period.between(start.toLocalDate(), end.toLocalDate());
-        System.out.println("Semester is " + length.getDays() + " days long.");
-
-        Semester semester = new Semester(start, end);
-
-		scheduleService.schedule(semester, course, "Smith", MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(semester, cs.getCourse(1), "Jones", TUESDAY, THURSDAY);
-		scheduleService.schedule(semester, cs.getCourse(2), "Smith", THURSDAY, TUESDAY);
-        Section sectionW = scheduleService.schedule(semester, cs.getCourse(3), "Washington", MONDAY, WEDNESDAY, FRIDAY);
-		scheduleService.schedule(semester, cs.getCourse(3), "Washington", TUESDAY, THURSDAY);
 
 		List<Section> sections = scheduleService.getSections();
 		for (Section section : sections) {
@@ -98,13 +117,44 @@ public class RegistrationApp {
  		}
 
 		printSchedule(scheduleService, "Smith", "Jones", "Washington");
-        printSchedule(sectionW);
+        if (sectionW != null) printSchedule(sectionW);
+
+		try {
+			courseService.persist(jsonDir);
+		} catch (IOException e) {
+			System.err.println("Error saving Courses: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
 
 //		System.out.println("Section IDs");
 //		printIds(scheduleService.getSections(), cs.getAllCourses(), ss.getAllStudents());
 	}
 
-    public static void printSchedule(Section section) {
+	private void primeServices() {
+		init(studentService);
+		init(courseService);
+		initSchedule();
+	}
+
+	private void initSchedule() {
+		Course course = courseService.getCourse(1);
+
+		ZonedDateTime start = ZonedDateTime.of(2020, 9, 1, 0, 0, 0, 0, ZoneId.of("America/New_York"));
+		ZonedDateTime end = ZonedDateTime.of(2020, 12, 23, 0, 0, 0, 0, ZoneId.of("America/New_York"));
+
+		Period length = Period.between(start.toLocalDate(), end.toLocalDate());
+		System.out.println("Semester is " + length.getDays() + " days long.");
+
+		Semester semester = new Semester(start, end);
+
+		scheduleService.schedule(semester, course, "Smith", MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(semester, courseService.getCourse(1), "Jones", TUESDAY, THURSDAY);
+		scheduleService.schedule(semester, courseService.getCourse(2), "Smith", THURSDAY, TUESDAY);
+		sectionW = scheduleService.schedule(semester, courseService.getCourse(3), "Washington", MONDAY, WEDNESDAY, FRIDAY);
+		scheduleService.schedule(semester, courseService.getCourse(3), "Washington", TUESDAY, THURSDAY);
+	}
+
+	public static void printSchedule(Section section) {
         Semester semester = section.getSemester();
         ZonedDateTime start = semester.getStart();
         ZonedDateTime end = semester.getEnd();

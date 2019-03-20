@@ -1,5 +1,7 @@
 package com.matrangola.school.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Course extends RegistrationItem {
 
 	private String title;
@@ -39,6 +41,7 @@ public class Course extends RegistrationItem {
 		this.credits = credits;
 	}
 
+	@JsonIgnore
 	public float[] getCreditList() {
 		return creditList;
 	}

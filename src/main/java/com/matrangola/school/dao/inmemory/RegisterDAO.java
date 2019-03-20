@@ -1,6 +1,7 @@
 package com.matrangola.school.dao.inmemory;
 
 import com.matrangola.school.dao.BaseDAO;
+import com.matrangola.school.dao.DaoException;
 import com.matrangola.school.domain.RegistrationItemInterface;
 
 import java.util.ArrayList;
@@ -13,9 +14,12 @@ public class RegisterDAO<T extends RegistrationItemInterface> implements BaseDAO
     int nextId = 0;
 
     @Override
-    public void update(T updateObject) {
-        if(itemMap.containsKey(updateObject.getId())) {
+    public void load(T updateObject) throws DaoException {
+        if(!itemMap.containsKey(updateObject.getId())) {
             itemMap.put(updateObject.getId(), updateObject);
+        }
+        else {
+            throw new DaoException("ID Exists: " + updateObject.getId());
         }
     }
 

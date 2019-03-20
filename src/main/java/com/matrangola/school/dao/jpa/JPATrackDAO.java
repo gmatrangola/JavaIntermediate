@@ -23,7 +23,7 @@ public class JPATrackDAO implements BaseDAO<Track> {
 	}
 
 	@Override
-	public void update(Track updateObject) {
+	public void load(Track updateObject) {
 		if(tracks.containsKey(updateObject.getId())) {
 			tracks.put(updateObject.getId(), updateObject);
 		}

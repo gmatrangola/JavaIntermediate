@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface BaseDAO<T> {
 
-	void update(T updateObject);
+	void load(T updateObject) throws DaoException;
 
 	void delete(T student);
 

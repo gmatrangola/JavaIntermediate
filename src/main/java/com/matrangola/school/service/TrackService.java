@@ -39,10 +39,6 @@ public class TrackService {
 		}
 	}
 	
-	public void updateTrack(Track track) {
-		trackDAO.update(track);
-	}
-	
 	public Track getTrack(int id) {
 		return trackDAO.get(id);
 	}

@@ -281,6 +281,20 @@ for (String s : old) {
 }
 ```
 
+### Processing Text File
+
+```java
+Path path = Paths.get("data/Sherlock.txt");
+Map<String, Long> wordCount = Files.lines(path).parallel()
+        .flatMap(line -> Arrays.stream(line.trim().split("\\s")))
+        .map(word -> word.replaceAll("[^a-zA-Z]", "").toLowerCase().trim())
+        .filter(word -> word.length() > 0)
+        .map(word -> new AbstractMap.SimpleEntry<>(word, 1))
+        .collect(groupingByConcurrent(AbstractMap.SimpleEntry::getKey, counting()));
+
+wordCount.forEach((k, v) -> System.out.println(String.format("%s ==>> %d", k, v)));
+```
+
 
 
 ## Generics
@@ -335,5 +349,214 @@ private static void printMeeting(ZonedDateTime next) {
     DateTimeFormatter format = DateTimeFormatter.ofPattern("MMMM d, yyyy");
     System.out.println(format.format(next));
 }
+```
+
+## Persistence with JSON
+
+Jackson library
+
+build.gradle file
+
+```groovy
+dependencies {
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', 
+        version: '2.9.8'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', 
+        version: '2.9.8'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations',
+        version: '2.9.8'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+```
+
+### Save
+
+CourseService.java
+
+```java
+public void persist() throws IOException {
+   for (Course course : getAllCourses()) {
+      persistCourse(course);
+   }
+
+}
+
+public void persistCourse(Course course) throws IOException {
+   ObjectMapper objectMapper = new ObjectMapper();
+   objectMapper.writeValue(new File(RegistrationApp.JSON_DIR, "Course-" +
+                                    course.getId() + ".json"), course);
+
+}
+```
+
+course-1.json
+
+```json
+{"id":1,"title":"Intro To Math","code":"Math-101","credits":1.0,"name":null}
+```
+
+Course.java
+
+```java
+@JsonIgnore
+public float[] getCreditList() {
+   return creditList;
+}
+```
+
+### Load
+
+CourseService.java
+
+```java
+public void load() throws IOException {
+   File[] files = RegistrationApp.JSON_DIR.listFiles((dir, name) -> name.startsWith("Course-"));
+   for (File file : files) {
+      load(file);
+   }
+
+}
+
+private void load(File file) throws IOException {
+   ObjectMapper objectMapper = new ObjectMapper();
+   Course course = objectMapper.readValue(file, Course.class);
+   courseDAO.update(course);
+}
+```
+
+RegisterDAO.java
+
+```java
+@Override
+public void update(T updateObject) {
+    itemMap.put(updateObject.getId(), updateObject);
+    OptionalInt max = itemMap.values().stream().mapToInt(value -> value.getId()).max();
+    nextId = max.getAsInt() + 1;
+}
+```
+
+RegistrationApp.java
+
+Make OO
+
+```java
+private StudentService studentService;
+private CourseService courseService;
+private ScheduleService scheduleService;
+
+public RegistrationApp() {
+		studentService = new StudentService();
+		courseService = new CourseService();
+		scheduleService = new ScheduleService();
+
+	}
+
+public static void main(String[] args) throws IOException {
+		RegistrationApp app = new RegistrationApp();
+		if (args.length == 0) {
+			app.primeAndPrintBoth();
+			app.courseService.persist();
+		} else if (args[0].equals("load")) {
+			app.courseService.load();
+			app.printCourses();
+		}
+
+		//postRequestToAddAStudent();
+		 //getRequestForAllStudents();
+	}
+```
+
+```java
+private void printCourses() throws IOException {
+   List<Course> courses = courseService.getAllCourses();
+   courses.forEach(System.out::println);
+
+   courseService.persist();
+
+   Stream<Course> courseStream = courseService.getAllCourses().stream();
+   Float totalCredits = courseStream
+         .map(Course::getCredits)
+         .peek( aFloat -> System.out.println("f = " + aFloat))
+         .reduce(0.0f, (a, b) -> a + b);
+   System.out.println("Average Credits " + totalCredits / courses.size());
+
+   courseStream = courseService.getAllCourses().stream();
+   System.out.println("Lower level classes...");
+   courseStream.filter(course -> course.getCredits() < 3.0f).forEach(System.out::println);
+
+   OptionalDouble easyAverage = courseService.getAllCourses().stream().mapToDouble(Course::getCredits).average();
+   if (easyAverage.isPresent()) System.out.println("Easy Average: " + easyAverage.getAsDouble());
+}
+```
+
+
+
+## Threading with Executors
+
+CourseService
+
+Use Thread() first then refactor
+
+Periodic polling
+
+```java
+public void poll() {
+   ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+   ScheduledFuture<?> result = executor.scheduleAtFixedRate(() -> {
+      try {
+         load();
+      } catch (IOException e) {
+         System.err.println("Error loading dir");
+         e.printStackTrace();
+      }
+   }, 5, 1, TimeUnit.SECONDS);
+
+   if (result.isCancelled()) System.out.println("canceled");
+}
+```
+
+## Junit and Mokito
+
+CourseServiceTest.java
+
+```java
+public class CourseServiceTest {
+
+    @Mock
+    InMemoryCourseDAO daoMock;
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Test
+    public void createCourse() {
+        // InMemoryCourseDAO testDao = mock(InMemoryCourseDAO.class);
+        Course testCourse = new Course("MATH101", "Intro to Math");
+        when(daoMock.create(testCourse)).thenReturn(testCourse);
+        when(daoMock.get(1)).thenReturn(testCourse);
+
+        CourseService cs = new CourseService(daoMock);
+        Course course = cs.createCourse("MATH101", "Intro to Math", 3.0f);
+
+        assertEquals("MATH101", course.getCode());
+
+    }
+
+    @Test
+    public void getCourseByCode() {
+        Course testCourse = new Course("MATH101", "Intro to Math");
+        List<Course> testList = Arrays.asList(testCourse);
+        when(daoMock.getAll()).thenReturn(testList);
+        CourseService cs = new CourseService(daoMock);
+
+        Course course = cs.getCourseByCode("MATH101");
+        assertEquals("MATH101", course.getCode());
+
+        Course course2 = cs.getCourseByCode("MATH2");
+        assertNull(course2);
+
+    }
 ```
 

@@ -13,7 +13,7 @@ public class JpaCourseDAO implements BaseDAO<Course> {
 	private Map<Integer, Course> courses = new HashMap<Integer, Course>();
 	private static int nextId = 0;
 	
-	public void update(Course updateObject) {
+	public void load(Course updateObject) {
 		if(courses.containsKey(updateObject.getId())) {
 			courses.put(updateObject.getId(), updateObject);
 		}

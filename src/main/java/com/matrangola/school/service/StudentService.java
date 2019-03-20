@@ -34,14 +34,6 @@ public class StudentService {
 		}
 	}
 	
-	public void updateStudent(Student student) {
-		studentDAO.update(student);
-	}
-	
-	public Student getStudent(int id) {
-		return studentDAO.get(id);
-	}
-	
 	public List<Student> getAllStudents() {
 		return studentDAO.getAll();
 	}

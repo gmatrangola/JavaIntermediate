@@ -1,6 +1,7 @@
 package com.matrangola.school.app;
 
 import com.matrangola.school.dao.DaoException;
+import com.matrangola.school.dao.inmemory.InMemoryCourseDAO;
 import com.matrangola.school.domain.*;
 import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.ScheduleService;
@@ -35,7 +36,7 @@ public class RegistrationApp {
 		jsonDir = file;
 		jsonDir.mkdir();
 		studentService = new StudentService();
-		courseService = new CourseService(jsonDir);
+		courseService = new CourseService(jsonDir, new InMemoryCourseDAO());
 		scheduleService = new ScheduleService();
 	}
 

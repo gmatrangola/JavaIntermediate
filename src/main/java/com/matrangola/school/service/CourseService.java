@@ -21,9 +21,16 @@ public class CourseService {
 
 	private BaseDAO<Course> courseDAO;
 	
-	public CourseService(File jsonDir) {
-		courseDAO = new InMemoryCourseDAO();
+	public CourseService(File jsonDir, InMemoryCourseDAO dao) {
+		courseDAO = dao;
 
+		if (jsonDir != null) {
+			startBackground(jsonDir);
+		}
+
+	}
+
+	private void startBackground(File jsonDir) {
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(10, r -> {
 			System.out.println("Thread Factory: ");
 			Thread thread = new Thread(r, "Course Loader");
@@ -44,7 +51,7 @@ public class CourseService {
 			System.out.println("Loaded " + count + " object. Thread: " + name + ": " + tid);
 		}, 5, 10, TimeUnit.SECONDS);
 	}
-	
+
 	public Course createCourse(String code, String title, float credits) {
 		Course course = new Course(code, title);
 		course.setCredits(credits);

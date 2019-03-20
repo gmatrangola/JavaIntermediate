@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RegisterDAO<T extends RegistrationItemInterface> implements BaseDAO<T> {
-    Map<Integer, T> itemMap = new HashMap<>();
+    Map<Integer, T> itemMap = new ConcurrentHashMap<>();
     int nextId = 0;
 
     @Override
-    public void load(T updateObject) throws DaoException {
+    public synchronized void load(T updateObject) throws DaoException {
         if(!itemMap.containsKey(updateObject.getId())) {
             itemMap.put(updateObject.getId(), updateObject);
         }
@@ -26,7 +27,7 @@ public class RegisterDAO<T extends RegistrationItemInterface> implements BaseDAO
     }
 
     @Override
-    public T create(T newObject) {
+    public synchronized T create(T newObject) {
         newObject.setId(++nextId);
         itemMap.put(newObject.getId(), newObject);
         return newObject;

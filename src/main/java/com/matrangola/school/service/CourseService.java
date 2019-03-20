@@ -10,6 +10,10 @@ import com.matrangola.school.domain.Internship;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
@@ -20,25 +24,25 @@ public class CourseService {
 	public CourseService(File jsonDir) {
 		courseDAO = new InMemoryCourseDAO();
 
-		Thread loadBackground = new Thread(() -> {
-			while(true) {
-				try {
-					load(jsonDir);
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (DaoException e) {
-					e.printStackTrace();
-				}
-				long count = getAllCourses().stream().count();
-				System.out.println("Loaded " + count + " object.");
-				try {
-					sleep(10000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+		ScheduledExecutorService executor = Executors.newScheduledThreadPool(10, r -> {
+			System.out.println("Thread Factory: ");
+			Thread thread = new Thread(r, "Course Loader");
+			return thread;
 		});
-		loadBackground.start();
+
+		ScheduledFuture<?> result = executor.scheduleWithFixedDelay(() -> {
+			try {
+				load(jsonDir);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (DaoException e) {
+				e.printStackTrace();
+			}
+			long count = getAllCourses().stream().count();
+			long tid = Thread.currentThread().getId();
+			String name = Thread.currentThread().getName();
+			System.out.println("Loaded " + count + " object. Thread: " + name + ": " + tid);
+		}, 5, 10, TimeUnit.SECONDS);
 	}
 	
 	public Course createCourse(String code, String title, float credits) {

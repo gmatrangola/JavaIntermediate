@@ -2,14 +2,10 @@ package com.matrangola.school.service;
 
 import com.matrangola.school.dao.inmemory.InMemoryCourseDAO;
 import com.matrangola.school.domain.Course;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.MockitoRule;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;

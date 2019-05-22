@@ -46,10 +46,32 @@ public class Demos {
         }
 
         List<String> arrayList = new ArrayList<>(Arrays.asList(CLASSICS));
-
+        System.out.println("All");
         System.out.println("Array = " + Arrays.toString(arrayList.toArray()));
         arrayList.forEach(System.out::println);
 
+        List<String> copy = Filter.filterListCopy(arrayList, s -> s.length() > 5);
+        System.out.println("\n\nFiltered > 5");
+        copy.forEach(System.out::println);
+
+        Filter.Test<String> myLambda = s -> {
+            boolean include = s.length() > 5;
+            include = include && s.startsWith("A");
+            return include;
+        };
+        List<String> complex = Filter.filterListCopy(arrayList, myLambda);
+
+        System.out.println("\nComplex");
+        complex.forEach(System.out::println);
+
+        Filter.filterList(arrayList, s -> s.startsWith("T"));
+        System.out.println("\n\nFiltered T");
+        arrayList.forEach(System.out::println);
+
+        Filter.prettyPrint(copy, () -> {
+            System.out.println("something");
+            System.out.println("Something else");
+        });
 
     }
 

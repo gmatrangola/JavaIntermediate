@@ -5,16 +5,25 @@ import com.matrangola.school.domain.Student;
 import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.StudentService;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class RegistrationApp {
 
 	int value;
+	private static StudentService studentService;
 
 	public static void main(String[] args) {
 		primeAndPrintBoth();
 		 //postRequestToAddAStudent();
 		 //getRequestForAllStudents();
+		printFullTime();
+	}
+
+	private static void printFullTime() {
+		List<Student> fullTime = studentService.getFullTimeSudents();
+		System.out.println("Full Time Students: " +  Arrays.toString(fullTime.toArray()));
 	}
 
 
@@ -34,9 +43,9 @@ public class RegistrationApp {
 	}
 
 	public static void primeAndPrintBoth() {
-		StudentService ss = new StudentService();
-		init(ss);
-		List<Student> students = ss.getAllStudents();
+		studentService = new StudentService();
+		init(studentService);
+		List<Student> students = studentService.getAllStudents();
 		students.forEach(System.out::println);
 
 		CourseService cs = new CourseService();

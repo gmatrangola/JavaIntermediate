@@ -1,5 +1,6 @@
 package com.matrangola.school.service;
 
+import com.matrangola.demos.Filter;
 import com.matrangola.school.dao.BaseDAO;
 import com.matrangola.school.dao.inmemory.InMemoryStudentDAO;
 import com.matrangola.school.domain.Student;
@@ -52,5 +53,11 @@ public class StudentService {
 
 	public void setStudentDAO(BaseDAO<Student> studentDAO) {
 		this.studentDAO = studentDAO;
+	}
+
+	public List<Student> getFullTimeSudents() {
+		List<Student> allStudents = getAllStudents();
+		return Filter.filterListCopy(allStudents,
+				s -> s.getStatus() == Student.Status.FULL_TIME);
 	}
 }

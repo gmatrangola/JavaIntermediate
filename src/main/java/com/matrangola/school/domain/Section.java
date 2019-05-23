@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Section implements Item {
+    private final Semester semester;
+    private final Course course;
     private DayOfWeek[] days;
     private Date time;
     private int room;
@@ -13,7 +15,9 @@ public class Section implements Item {
     private List<Student> students;
     private int id;
 
-    public Section(DayOfWeek[] days, int room, String instructor, List<Student> students) {
+    public Section(Semester semester, Course course, DayOfWeek[] days, int room, String instructor, List<Student> students) {
+        this.semester = semester;
+        this.course = course;
         this.days = days;
         this.room = room;
         this.instructor = instructor;
@@ -60,16 +64,12 @@ public class Section implements Item {
         this.time = time;
     }
 
-    @Override
-    public String toString() {
-        return "Section{" +
-                "days=" + Arrays.toString(days) +
-                ", time=" + time +
-                ", room=" + room +
-                ", instructor='" + instructor + '\'' +
-                ", students=" + students +
-                ", id=" + id +
-                '}';
+    public Semester getSemester() {
+        return semester;
+    }
+
+    public Course getCourse() {
+        return course;
     }
 
     @Override
@@ -80,5 +80,19 @@ public class Section implements Item {
     @Override
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                "semester=" + semester +
+                ", course=" + course +
+                ", days=" + Arrays.toString(days) +
+                ", time=" + time +
+                ", room=" + room +
+                ", instructor='" + instructor + '\'' +
+                ", students=" + students +
+                ", id=" + id +
+                '}';
     }
 }

@@ -7,6 +7,7 @@ import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.ScheduleService;
 import com.matrangola.school.service.StudentService;
 
+import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -63,6 +64,11 @@ public class RegistrationApp {
 		ZonedDateTime end = ZonedDateTime.of(2020, 12, 23, 0, 0, 0, 0, ZoneId.of("America/New_York"));
 
 		Semester fall = new Semester(start, end);
+		scheduleService.addSemester(fall);
+        Course course = courseService.getAllCourses().get(0);
+		scheduleService.schedule(fall, course, "Dr Smith", students, DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+
+		scheduleService.getAllSections().forEach(System.out::println);
 
 	}
 

@@ -1,8 +1,13 @@
 package com.matrangola.school.domain;
 
-public class Student implements Item {
-	
-	public enum Status { 
+public class Student implements Item, Comparable<Student> {
+
+	@Override
+	public int compareTo(Student o) {
+		return Integer.compare(id, o.id);
+	}
+
+	public enum Status {
 		FULL_TIME,
 		PART_TIME,
 		HIBERNATING

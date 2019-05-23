@@ -6,7 +6,6 @@ import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.StudentService;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class RegistrationApp {
@@ -22,7 +21,7 @@ public class RegistrationApp {
 	}
 
 	private static void printFullTime() {
-		List<Student> fullTime = studentService.getFullTimeSudents();
+		List<Student> fullTime = studentService.getFullTimeStudents();
 		System.out.println("Full Time Students: " +  Arrays.toString(fullTime.toArray()));
 	}
 

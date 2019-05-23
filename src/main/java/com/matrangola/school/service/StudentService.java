@@ -6,6 +6,7 @@ import com.matrangola.school.dao.inmemory.InMemoryStudentDAO;
 import com.matrangola.school.domain.Student;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StudentService {
 	
@@ -55,9 +56,11 @@ public class StudentService {
 		this.studentDAO = studentDAO;
 	}
 
-	public List<Student> getFullTimeSudents() {
+	public List<Student> getFullTimeStudents() {
 		List<Student> allStudents = getAllStudents();
-		return Filter.filterListCopy(allStudents,
-				s -> s.getStatus() == Student.Status.FULL_TIME);
+		return allStudents.stream()
+				.filter(s -> s.getStatus() == Student.Status.FULL_TIME)
+				.sorted()
+				.collect(Collectors.toList());
 	}
 }

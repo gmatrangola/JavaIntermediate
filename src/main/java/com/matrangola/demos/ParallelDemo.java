@@ -39,9 +39,19 @@ public class ParallelDemo {
                 .map(word -> new AbstractMap.SimpleEntry<>(word, 1))
                 .collect(groupingByConcurrent(AbstractMap.SimpleEntry::getKey, counting()));
         System.out.println("Time = " + (System.currentTimeMillis() - start));
-        wordCount.forEach((k, v) -> System.out.println(String.format("%s ==>> %d", k, v)));
+//        wordCount.forEach((k, v) -> System.out.println(String.format("%s ==>> %d", k, v)));
 
+        System.out.println("By WORD --------------");
+        List<Map.Entry<String, Long>> byWord = wordCount.entrySet().stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .collect(Collectors.toList());
+        byWord.forEach(entry -> System.out.println(entry.getKey() + ": " + entry.getValue()));
 
+        System.out.println("By COUNT --------------");
+        List<Map.Entry<String, Long>> byCount = wordCount.entrySet().stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .collect(Collectors.toList());
+        byCount.forEach(entry -> System.out.println(entry.getKey() + ": " + entry.getValue()));
     }
 
     public static void main(String[] args) throws IOException {

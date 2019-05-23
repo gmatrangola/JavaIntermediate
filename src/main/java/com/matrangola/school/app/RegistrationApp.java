@@ -1,6 +1,7 @@
 package com.matrangola.school.app;
 
 import com.matrangola.school.domain.Course;
+import com.matrangola.school.domain.Section;
 import com.matrangola.school.domain.Semester;
 import com.matrangola.school.domain.Student;
 import com.matrangola.school.service.CourseService;
@@ -10,6 +11,9 @@ import com.matrangola.school.service.StudentService;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,12 +71,39 @@ public class RegistrationApp {
 		scheduleService.addSemester(fall);
         Course course = courseService.getAllCourses().get(0);
 		scheduleService.schedule(fall, course, "Dr Smith", students, DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+        scheduleService.schedule(fall, courses.get(1), "Dr Jones", students, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY);
 
-		scheduleService.getAllSections().forEach(System.out::println);
+        for (Section section : scheduleService.getAllSections()) {
+            printSchedule(fall, section);
+        }
 
 	}
 
-	public static void init(StudentService ss) {
+    private static void printSchedule(Semester semester, Section section) {
+        ZonedDateTime start = semester.getStart();
+        ZonedDateTime end = semester.getEnd();
+
+        ZonedDateTime first = null;
+        for (DayOfWeek day : section.getDays()) {
+            ZonedDateTime next = start.with(TemporalAdjusters.nextOrSame(day));
+            if (first == null || next.isBefore(first)) first = next;
+        }
+
+        ZonedDateTime meet = first;
+        while ( meet.isBefore(end)) {
+            for (DayOfWeek day : section.getDays()) {
+                meet = meet.with(TemporalAdjusters.nextOrSame(day));
+                printMeeting(section.getCourse().getCode(), meet);
+            }
+        }
+    }
+
+    private static void printMeeting(String name, ZonedDateTime next) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("E, MMMM d, yyyy");
+        System.out.println(name + ": " + format.format(next));
+    }
+
+    public static void init(StudentService ss) {
 		ss.createStudent("Manoj", "282 939 9944", Student.Status.FULL_TIME);
 		ss.createStudent("Charlene", "282 898 2145", Student.Status.FULL_TIME);
 		ss.createStudent("Firoze", "228 678 8765", Student.Status.HIBERNATING);

@@ -77,9 +77,18 @@ public class RegistrationApp {
             printSchedule(fall, section);
         }
 
+		scheduleService.getAllSections().forEach(s -> s.getStudents().forEach(student ->  printSectionStudent(s,student)));
+        scheduleService.getAllSections().forEach(s -> {
+			System.out.println("Section: " + s.getCourse().getCode());
+			s.getStudents().forEach(student -> System.out.println("Student: " + student.getName()));
+		});
 	}
 
-    private static void printSchedule(Semester semester, Section section) {
+	private static void printSectionStudent(Section section, Student student) {
+		System.out.println(section.getCourse().getCode() + ": " + student.getName());
+	}
+
+	private static void printSchedule(Semester semester, Section section) {
         ZonedDateTime start = semester.getStart();
         ZonedDateTime end = semester.getEnd();
 

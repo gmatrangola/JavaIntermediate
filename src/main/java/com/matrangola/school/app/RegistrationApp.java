@@ -1,10 +1,14 @@
 package com.matrangola.school.app;
 
 import com.matrangola.school.domain.Course;
+import com.matrangola.school.domain.Semester;
 import com.matrangola.school.domain.Student;
 import com.matrangola.school.service.CourseService;
+import com.matrangola.school.service.ScheduleService;
 import com.matrangola.school.service.StudentService;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,6 +16,8 @@ public class RegistrationApp {
 
 	int value;
 	private static StudentService studentService;
+	private static CourseService courseService;
+	private static ScheduleService scheduleService;
 
 	public static void main(String[] args) {
 		primeAndPrintBoth();
@@ -47,10 +53,16 @@ public class RegistrationApp {
 		List<Student> students = studentService.getAllStudents();
 		students.forEach(System.out::println);
 
-		CourseService cs = new CourseService();
-		init(cs);
-		List<Course> courses = cs.getAllCourses();
+		courseService = new CourseService();
+		init(courseService);
+		List<Course> courses = courseService.getAllCourses();
 		courses.forEach(System.out::println);
+
+		scheduleService = new ScheduleService();
+		ZonedDateTime start = ZonedDateTime.of(2020, 9, 1, 0, 0, 0, 0, ZoneId.of("America/New_York"));
+		ZonedDateTime end = ZonedDateTime.of(2020, 12, 23, 0, 0, 0, 0, ZoneId.of("America/New_York"));
+
+		Semester fall = new Semester(start, end);
 
 	}
 

@@ -1,6 +1,6 @@
 package com.matrangola.school.domain;
 
-public class Course {
+public class Course implements Item {
 	
 	private int id;
 	private String title;
@@ -19,9 +19,11 @@ public class Course {
 		this.code = code;
 	}
 	
+	@Override
 	public int getId() {
 		return id;
 	}
+	@Override
 	public void setId(int id) {
 		this.id = id;
 	}

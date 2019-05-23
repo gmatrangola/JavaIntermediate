@@ -1,6 +1,6 @@
 package com.matrangola.school.domain;
 
-public class Student {
+public class Student implements Item {
 	
 	public enum Status { 
 		FULL_TIME,

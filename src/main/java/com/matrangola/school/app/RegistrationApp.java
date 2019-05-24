@@ -14,8 +14,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class RegistrationApp {
 
@@ -24,7 +26,18 @@ public class RegistrationApp {
 	private static CourseService courseService;
 	private static ScheduleService scheduleService;
 
+	private static Executor executor;
+	private static ExecutorCompletionService<String> completionService;
+
 	public static void main(String[] args) {
+		executor = Executors.newFixedThreadPool(10, r -> {
+			Thread thread = new Thread(r);
+			thread.setName("Formatter");
+			thread.setDaemon(true);
+			return thread;
+		});
+		completionService = new ExecutorCompletionService<>(executor);
+
 		primeAndPrintBoth();
 		 //postRequestToAddAStudent();
 		 //getRequestForAllStudents();
@@ -73,22 +86,46 @@ public class RegistrationApp {
 		scheduleService.schedule(fall, course, "Dr Smith", students, DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
         scheduleService.schedule(fall, courses.get(1), "Dr Jones", students, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY);
 
-        for (Section section : scheduleService.getAllSections()) {
-            printSchedule(fall, section);
-        }
-
-		scheduleService.getAllSections().forEach(s -> s.getStudents().forEach(student ->  printSectionStudent(s,student)));
+        scheduleService.getAllSections().forEach(s -> s.getStudents().forEach(student ->  printSectionStudent(s,student)));
         scheduleService.getAllSections().forEach(s -> {
 			System.out.println("Section: " + s.getCourse().getCode());
 			s.getStudents().forEach(student -> System.out.println("Student: " + student.getName()));
 		});
+
+        new Thread(() -> printAllSchedules(fall)).start();
+
+	}
+
+	private static void printAllSchedules(Semester fall) {
+		StringBuilder sb = new StringBuilder();
+
+		int futures = 0;
+		for (Section section : scheduleService.getAllSections()) {
+			completionService.submit(() -> printSchedule(fall, section));
+			futures++;
+		}
+
+		int completed = 0;
+		while(completed < futures) {
+			try {
+				Future<String> future = completionService.take();
+				sb.append(future.get());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			completed++;
+		}
+		System.out.println(sb.toString());
 	}
 
 	private static void printSectionStudent(Section section, Student student) {
 		System.out.println(section.getCourse().getCode() + ": " + student.getName());
 	}
 
-	private static void printSchedule(Semester semester, Section section) {
+	private static String printSchedule(Semester semester, Section section) {
+		StringBuilder sb = new StringBuilder();
         ZonedDateTime start = semester.getStart();
         ZonedDateTime end = semester.getEnd();
 
@@ -102,14 +139,15 @@ public class RegistrationApp {
         while ( meet.isBefore(end)) {
             for (DayOfWeek day : section.getDays()) {
                 meet = meet.with(TemporalAdjusters.nextOrSame(day));
-                printMeeting(section.getCourse().getCode(), meet);
+                sb.append(printMeeting(section.getCourse().getCode(), meet));
             }
         }
+        return sb.toString();
     }
 
-    private static void printMeeting(String name, ZonedDateTime next) {
+    private static String printMeeting(String name, ZonedDateTime next) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("E, MMMM d, yyyy");
-        System.out.println(name + ": " + format.format(next));
+        return name + ": " + format.format(next);
     }
 
     public static void init(StudentService ss) {

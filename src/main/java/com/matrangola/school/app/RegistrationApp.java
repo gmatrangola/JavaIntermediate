@@ -100,6 +100,7 @@ public class RegistrationApp {
         new Thread(() -> printAllSchedules(fall)).start();
 
         courseService.persist(new File("."));
+        scheduleService.persist(new File("."));
 
 	}
 
@@ -165,10 +166,10 @@ public class RegistrationApp {
 	}
 
 	public static void init(CourseService cs) throws IOException {
-		cs.load(new File("."));
-//		cs.createCourse("Math-101", "Intro To Math");
-//		cs.createCourse("Math-201", "More Math");
-//		cs.createCourse("Phys-101", "Baby Physics");
+//		cs.load(new File("."));
+		cs.createCourse("Math-101", "Intro To Math");
+		cs.createCourse("Math-201", "More Math");
+		cs.createCourse("Phys-101", "Baby Physics");
 	}
 
 }

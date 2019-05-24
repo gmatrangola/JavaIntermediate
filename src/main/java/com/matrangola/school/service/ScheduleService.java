@@ -1,5 +1,6 @@
 package com.matrangola.school.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matrangola.school.dao.inmemory.InMemorySectionDAO;
 import com.matrangola.school.dao.inmemory.InMemorySemesterDAO;
 import com.matrangola.school.domain.Course;
@@ -7,6 +8,8 @@ import com.matrangola.school.domain.Section;
 import com.matrangola.school.domain.Semester;
 import com.matrangola.school.domain.Student;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -32,5 +35,17 @@ public class ScheduleService {
 
     public List<Section> getAllSections() {
         return sectionDAO.getAll();
+    }
+
+    public void persist(File jsonDir) throws IOException {
+        for (Section section : getAllSections()) {
+            persist(jsonDir, section);
+        }
+
+    }
+
+    private void persist(File jsonDir, Section section) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.writeValue(new File(jsonDir, "Section-" + section.getCourse().getCode() + ".json"), section);
     }
 }

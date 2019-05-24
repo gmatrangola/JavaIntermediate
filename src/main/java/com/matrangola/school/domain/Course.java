@@ -1,5 +1,7 @@
 package com.matrangola.school.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Course implements Item {
 	
 	private int id;
@@ -48,6 +50,7 @@ public class Course implements Item {
 		this.credits = credits;
 	}
 
+	@JsonIgnore
 	public float[] getCreditList() {
 		return creditList;
 	}

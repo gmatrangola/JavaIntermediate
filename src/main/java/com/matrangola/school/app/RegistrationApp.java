@@ -11,6 +11,8 @@ import com.matrangola.school.service.CourseService;
 import com.matrangola.school.service.ScheduleService;
 import com.matrangola.school.service.StudentService;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -32,7 +34,7 @@ public class RegistrationApp {
 	private static Executor executor;
 	private static ExecutorCompletionService<String> completionService;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		executor = Executors.newFixedThreadPool(10, r -> {
 			Thread thread = new Thread(r);
 			thread.setName("Formatter");
@@ -68,7 +70,7 @@ public class RegistrationApp {
 		students.forEach(System.out::println);
 	}
 
-	public static void primeAndPrintBoth() {
+	public static void primeAndPrintBoth() throws IOException {
 		studentService = new StudentService();
 		init(studentService);
 		List<Student> students = studentService.getAllStudents();
@@ -96,6 +98,8 @@ public class RegistrationApp {
 		});
 
         new Thread(() -> printAllSchedules(fall)).start();
+
+        courseService.persist(new File("."));
 
 	}
 
@@ -160,10 +164,11 @@ public class RegistrationApp {
 		ss.createStudent("Joe", "3838 678 3838", Student.Status.PART_TIME);
 	}
 
-	public static void init(CourseService cs) {
-		cs.createCourse("Math-101", "Intro To Math");
-		cs.createCourse("Math-201", "More Math");
-		cs.createCourse("Phys-101", "Baby Physics");
+	public static void init(CourseService cs) throws IOException {
+		cs.load(new File("."));
+//		cs.createCourse("Math-101", "Intro To Math");
+//		cs.createCourse("Math-201", "More Math");
+//		cs.createCourse("Phys-101", "Baby Physics");
 	}
 
 }

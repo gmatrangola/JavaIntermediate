@@ -1,5 +1,8 @@
 package com.matrangola.school.app;
 
+import com.matrangola.school.dao.inmemory.InMemoryCourseDAO;
+import com.matrangola.school.dao.inmemory.InMemorySectionDAO;
+import com.matrangola.school.dao.inmemory.InMemorySemesterDAO;
 import com.matrangola.school.domain.Course;
 import com.matrangola.school.domain.Section;
 import com.matrangola.school.domain.Semester;
@@ -71,12 +74,12 @@ public class RegistrationApp {
 		List<Student> students = studentService.getAllStudents();
 		students.forEach(System.out::println);
 
-		courseService = new CourseService();
+		courseService = new CourseService(new InMemoryCourseDAO());
 		init(courseService);
 		List<Course> courses = courseService.getAllCourses();
 		courses.forEach(System.out::println);
 
-		scheduleService = new ScheduleService();
+		scheduleService = new ScheduleService(new InMemorySemesterDAO(), new InMemorySectionDAO());
 		ZonedDateTime start = ZonedDateTime.of(2020, 9, 1, 0, 0, 0, 0, ZoneId.of("America/New_York"));
 		ZonedDateTime end = ZonedDateTime.of(2020, 12, 23, 0, 0, 0, 0, ZoneId.of("America/New_York"));
 

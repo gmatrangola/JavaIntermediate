@@ -10,8 +10,9 @@ public class CourseService {
 
 	private BaseDAO<Course> courseDAO;
 	
-	public CourseService() {
-		courseDAO = new InMemoryCourseDAO();
+	public CourseService(BaseDAO<Course> dao)
+	{
+		courseDAO = dao;
 	}
 	
 	public Course createCourse(String code, String title) {
@@ -26,7 +27,15 @@ public class CourseService {
 		
 		return course;
 	}
-	
+
+	public Course createCourse(String code, String title, float credits) {
+		Course c = createCourse(code, title);
+		if (c == null) return null;
+		c.setCredits(credits);
+		return c;
+	}
+
+
 	public void deleteCourse(int id) {
 		Course course = courseDAO.get(id);
 		if(course != null) {
@@ -63,4 +72,5 @@ public class CourseService {
 	public void setCourseDAO(BaseDAO<Course> courseDAO) {
 		this.courseDAO = courseDAO;
 	}
+
 }

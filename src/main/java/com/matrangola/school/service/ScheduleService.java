@@ -11,17 +11,23 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 public class ScheduleService {
-    private InMemorySemesterDAO semesterDAO = new InMemorySemesterDAO();
-    private InMemorySectionDAO sectionDAO = new InMemorySectionDAO();
+    private InMemorySemesterDAO semesterDAO;
+    private InMemorySectionDAO sectionDAO;
 
-    public void addSemester(Semester semester) {
-        semesterDAO.create(semester);
+    public ScheduleService(InMemorySemesterDAO semester, InMemorySectionDAO section) {
+        semesterDAO = semester;
+        sectionDAO = section;
     }
 
-    public void schedule(Semester semester, Course course, String instructor, List<Student> students, DayOfWeek... daysOfWeek) {
+    public Semester addSemester(Semester semester) {
+        semesterDAO.create(semester);
+        return semester;
+    }
+
+    public Section schedule(Semester semester, Course course, String instructor, List<Student> students, DayOfWeek... daysOfWeek) {
         Section section = new Section(semester, course, daysOfWeek, 0, instructor, students);
         sectionDAO.create(section);
-
+        return section;
     }
 
     public List<Section> getAllSections() {
